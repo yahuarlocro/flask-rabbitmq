@@ -1,8 +1,11 @@
 from flask import Flask
+import pika
 from connection import RabbitMQConnection
 
 app = Flask(__name__)
 
+
+queue_name = 'new_task_queue'
 
 @app.route('/')
 def index():
@@ -11,19 +14,14 @@ def index():
 
 @app.route('/order/<service>')
 def send_order(service):
-    queue_name = 'order'
-
     # create connection and order queue
-    with RabbitMQConnection(host='localhost',queue_name=queue_name) as rc:
-        
+    with RabbitMQConnection(host='localhost', queue_name=queue_name) as rc:
+
         # publish message to exchange
-        rc.basic_publish(exchange='',routing_key=queue_name, body=service)
+        rc.basic_publish(exchange='', routing_key=queue_name, body=service, properties= pika.BasicProperties(delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE))
 
-
-
-    print(" [x] Sent 'order was sent'")
+    print(" [x] Sent %r" % service)
     return 'order was sent'
-
 
 
 if __name__ == '__main__':
