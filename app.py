@@ -5,7 +5,7 @@ from connection import RabbitMQConnection
 app = Flask(__name__)
 
 
-queue_name = 'new_task_queue'
+queue_name = 'my_task_queue'
 
 @app.route('/')
 def index():
